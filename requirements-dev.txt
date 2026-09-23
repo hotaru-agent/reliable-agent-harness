@@ -1,0 +1,9 @@
+# Development / test dependencies.
+# Install with: pip install -r requirements-dev.txt
+# This pulls in runtime dependencies from requirements.txt plus
+# test-only dependencies below.
+
+-r requirements.txt
+
+# Test framework
+pytest>=8,<10
