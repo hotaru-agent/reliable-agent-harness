@@ -315,8 +315,18 @@ class TestPathSafety:
         fixture = make_filesystem_calculator_fixture()
         repo = fixture.materialize()
         try:
-            with pytest.raises(FilesystemPathError):
-                repo.read_file("C:\\Windows\\System32\\drivers\\etc\\hosts")
+            if os.name == "nt":
+                # Drive-letter paths are absolute on Windows and are
+                # rejected before touching the filesystem.
+                with pytest.raises(FilesystemPathError):
+                    repo.read_file("C:\\Windows\\System32\\drivers\\etc\\hosts")
+            else:
+                # On POSIX a drive-letter path is not absolute — it is
+                # a relative filename inside the repo root and can
+                # never escape. Since no such file exists, the safe
+                # outcome is a not-found error.
+                with pytest.raises(FilesystemFileNotFoundError):
+                    repo.read_file("C:\\Windows\\System32\\drivers\\etc\\hosts")
         finally:
             repo.cleanup()
 
