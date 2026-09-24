@@ -86,10 +86,21 @@ class TestDocumentationExists:
         assert (_PROJECT_ROOT / "REPRODUCING.md").exists()
 
     def test_step10_summary_exists(self):
-        assert (_PROJECT_ROOT / "docs" / "history" / "en" / "phase7_step10_summary.md").exists()
+        # docs/ is local-only development history (gitignored). On a
+        # clean public checkout it does not exist; the public
+        # contract is that .gitignore excludes docs/.
+        p = _PROJECT_ROOT / "docs" / "history" / "en" / "phase7_step10_summary.md"
+        if not (_PROJECT_ROOT / "docs" / "history").exists():
+            assert "docs/" in (_PROJECT_ROOT / ".gitignore").read_text(encoding="utf-8")
+            return
+        assert p.exists()
 
     def test_step10_summary_zh_exists(self):
-        assert (_PROJECT_ROOT / "docs" / "history" / "zh" / "phase7_step10_summary.md").exists()
+        p = _PROJECT_ROOT / "docs" / "history" / "zh" / "phase7_step10_summary.md"
+        if not (_PROJECT_ROOT / "docs" / "history").exists():
+            assert "docs/" in (_PROJECT_ROOT / ".gitignore").read_text(encoding="utf-8")
+            return
+        assert p.exists()
 
 
 # ---------------------------------------------------------------------------

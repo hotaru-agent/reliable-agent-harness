@@ -132,26 +132,52 @@ class TestREADMEContent:
 # ---------------------------------------------------------------------------
 
 class TestHistoryOrganization:
+    """docs/history/ is local-only development history (gitignored).
+    On a clean public checkout it does not exist — the public
+    contract is that .gitignore excludes docs/. When the directory
+    is present locally, its structure is still validated."""
+
+    _HISTORY_DIR = _PROJECT_ROOT / "docs" / "history"
+
+    def _docs_gitignored(self) -> None:
+        assert "docs/" in _read(_PROJECT_ROOT / ".gitignore")
+
     def test_history_dir_exists(self):
-        assert (_PROJECT_ROOT / "docs" / "history").exists()
+        if not self._HISTORY_DIR.exists():
+            self._docs_gitignored()
+            return
+        assert self._HISTORY_DIR.exists()
 
     def test_history_readme_exists(self):
-        assert (_PROJECT_ROOT / "docs" / "history" / "README.md").exists()
+        if not self._HISTORY_DIR.exists():
+            self._docs_gitignored()
+            return
+        assert (self._HISTORY_DIR / "README.md").exists()
 
     def test_en_dir_exists(self):
-        assert (_PROJECT_ROOT / "docs" / "history" / "en").exists()
+        if not self._HISTORY_DIR.exists():
+            self._docs_gitignored()
+            return
+        assert (self._HISTORY_DIR / "en").exists()
 
     def test_zh_dir_exists(self):
-        assert (_PROJECT_ROOT / "docs" / "history" / "zh").exists()
+        if not self._HISTORY_DIR.exists():
+            self._docs_gitignored()
+            return
+        assert (self._HISTORY_DIR / "zh").exists()
 
     def test_en_has_summaries(self):
-        en_dir = _PROJECT_ROOT / "docs" / "history" / "en"
-        summaries = list(en_dir.glob("phase*_summary.md"))
+        if not self._HISTORY_DIR.exists():
+            self._docs_gitignored()
+            return
+        summaries = list((self._HISTORY_DIR / "en").glob("phase*_summary.md"))
         assert len(summaries) >= 20
 
     def test_zh_has_summaries(self):
-        zh_dir = _PROJECT_ROOT / "docs" / "history" / "zh"
-        summaries = list(zh_dir.glob("phase*_summary.md"))
+        if not self._HISTORY_DIR.exists():
+            self._docs_gitignored()
+            return
+        summaries = list((self._HISTORY_DIR / "zh").glob("phase*_summary.md"))
         assert len(summaries) >= 20
 
     def test_no_phase_summaries_in_root(self):
@@ -172,6 +198,14 @@ class TestPublicPrivateSeparation:
         assert "面试话术.md" in text
 
     def test_interview_file_exists_locally(self):
+        # The interview-prep file is local-only (gitignored). On a
+        # clean public checkout it does not exist; when present
+        # locally it must still be ignored. Either way, .gitignore
+        # must exclude it — verified by the companion test above.
+        if not (_PROJECT_ROOT / "面试话术.md").exists():
+            text = _read(_PROJECT_ROOT / ".gitignore")
+            assert "面试话术.md" in text
+            return
         assert (_PROJECT_ROOT / "面试话术.md").exists()
 
     def test_gitignore_excludes_devin_config(self):
@@ -203,6 +237,8 @@ class TestRootCleanliness:
         assert (_PROJECT_ROOT / ".gitignore").exists()
 
     def test_root_has_core_dirs(self):
+        # docs/ is local-only development history (gitignored) and
+        # is not part of the public repository layout.
         for d in ("harness", "tools", "storage", "mcp_adapter",
-                  "observability", "evaluation", "tests", "docs"):
+                  "observability", "evaluation", "tests"):
             assert (_PROJECT_ROOT / d).exists(), d
