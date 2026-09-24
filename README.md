@@ -1,5 +1,7 @@
 # Reliable Agent Harness for Long-Horizon Tool-Using Agents
 
+[![CI](https://github.com/hotaru-agent/reliable-agent-harness/actions/workflows/ci.yml/badge.svg)](https://github.com/hotaru-agent/reliable-agent-harness/actions/workflows/ci.yml)
+
 A business-agnostic reliability runtime for long-horizon tool-using
 agents.
 
@@ -124,6 +126,10 @@ Loop and context mechanisms are validated separately in
 `controlled_v1` and are not combined into this integrated scenario.
 
 ## Quick Start
+
+Requires Python 3.10 or newer (CI verifies Python 3.11 on Ubuntu and
+Windows; see [REPRODUCING.md](REPRODUCING.md) for the tested
+environment).
 
 ```bash
 python -m venv .venv
