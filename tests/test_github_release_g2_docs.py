@@ -19,6 +19,16 @@ def _read(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
 
+# The verified CI badge for this repository's own workflow. Added in
+# G6 after GitHub Actions passed for real on both matrix platforms.
+_CI_BADGE = (
+    "[![CI](https://github.com/hotaru-agent/reliable-agent-harness"
+    "/actions/workflows/ci.yml/badge.svg)]"
+    "(https://github.com/hotaru-agent/reliable-agent-harness"
+    "/actions/workflows/ci.yml)"
+)
+
+
 # ---------------------------------------------------------------------------
 # README existence and structure
 # ---------------------------------------------------------------------------
@@ -106,11 +116,15 @@ class TestREADMEContent:
         assert "battle tested" not in text.lower()
 
     def test_readme_no_github_url(self):
-        text = _read(_PROJECT_ROOT / "README.md")
+        # Only the repository's own verified CI badge may reference
+        # GitHub; no other GitHub links are allowed.
+        text = _read(_PROJECT_ROOT / "README.md").replace(_CI_BADGE, "")
         assert "github.com/" not in text
 
     def test_readme_no_badges(self):
-        text = _read(_PROJECT_ROOT / "README.md")
+        # The real CI badge is the only permitted badge; no shields.io
+        # or other status badges.
+        text = _read(_PROJECT_ROOT / "README.md").replace(_CI_BADGE, "")
         assert "shields.io" not in text
         assert "badge" not in text.lower()
 
